@@ -18,7 +18,7 @@ pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/KeeperCompatibleInterface.sol";
+import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
 
 error Raffle__NotEnoughETHEntered();
 error Raffle__TransferFailed();
@@ -31,7 +31,7 @@ error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint25
  * @notice This contract is for creating an untamperable decentralized smart contract
  * @dev This implements Chainlink VRF v2 and Chainlink Keeper
  */
-contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
+contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
     /* Type declarations */
     enum RaffleState {
         OPEN,
@@ -62,7 +62,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     /* Functions */
     constructor(
-        address vrfCoordinatorV2,
+        address vrfCoordinatorV2, // mock
         uint256 entranceFee,
         bytes32 gasLane,
         uint64 subscriptionId,
@@ -89,6 +89,8 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         }
 
         s_players.push(payable(msg.sender));
+        // Emit an event when we update a dynamic array or mapping
+        // Names events with the function name reversed
         emit RaffleEnter(msg.sender);
     }
 
@@ -118,9 +120,6 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
      * will automatically call `performUpkeep` function
      */
     function performUpkeep(bytes calldata /* performData */) external override {
-        // Requesr the random number
-        // Once we get it, do something with it
-        // 2 transaction process
         (bool upkeepNeeded, ) = checkUpkeep("");
         if (!upkeepNeeded) {
             revert Raffle__UpkeepNotNeeded(
@@ -194,5 +193,9 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     function getRequestConfirmations() public pure returns (uint256) {
         return REQUEST_CONFIRMATION;
+    }
+
+    function getInterval() public view returns (uint256) {
+        return i_interval;
     }
 }

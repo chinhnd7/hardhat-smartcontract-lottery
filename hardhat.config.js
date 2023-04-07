@@ -15,7 +15,7 @@ const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "key"
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-    defaultNetwork: "harthat",
+    defaultNetwork: "hardhat",
     networks: {
         hardhat: {
             chainId: 31337,
@@ -28,6 +28,15 @@ module.exports = {
             accounts: [PRIVATE_KEY],
         },
     },
+
+    gasReporter: {
+        enabled: false,
+        currency: "USD",
+        outputFile: "gas-report.txt",
+        noColors: true,
+        // coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+    },
+
     solidity: "0.8.8",
     namedAccounts: {
         deployer: {
@@ -37,4 +46,10 @@ module.exports = {
             default: 1,
         },
     },
+    etherscan: {
+        apiKey: ETHERSCAN_API_KEY,
+    },
+    mocha: {
+        timeout: 700000, // 500 seconds max
+    }
 }
